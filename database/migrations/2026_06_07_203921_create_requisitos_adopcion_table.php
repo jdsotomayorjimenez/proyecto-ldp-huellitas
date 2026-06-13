@@ -11,9 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('requisito_adopcions', function (Blueprint $table) {
+        Schema::create('requisitos_adopcion', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tipo_mascota_id')->constrained('tipos_mascotas');
+            $table->string('nombre', 100);
+            $table->string('descripcion', 255)->nullable();
+            $table->boolean('obligatorio')->default(true);
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
+
+            $table->unique(['tipo_mascota_id', 'nombre']);
         });
     }
 
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('requisito_adopcions');
+        Schema::dropIfExists('requisitos_adopcion');
     }
 };

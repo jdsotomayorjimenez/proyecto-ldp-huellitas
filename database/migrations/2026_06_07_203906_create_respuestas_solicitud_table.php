@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('respuesta_solicituds', function (Blueprint $table) {
+        Schema::create('respuestas_solicitud', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('solicitud_adopcion_id')
+                ->unique()
+                ->constrained('solicitudes_adopcion');
+            $table->foreignId('administrador_id')->constrained('users');
+            $table->enum('resultado', ['aprobada', 'rechazada']);
+            $table->string('respuesta', 255);
+            $table->date('fecha_respuesta');
             $table->timestamps();
         });
     }
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('respuesta_solicituds');
+        Schema::dropIfExists('respuestas_solicitud');
     }
 };
