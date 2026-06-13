@@ -1,5 +1,7 @@
 # Huellitas - Parte 1
 
+Juan Diego Sotomayor
+
 ## Descripción general
 
 Huellitas es una aplicación web desarrollada con Laravel para apoyar la
@@ -275,3 +277,5 @@ coordinada para evitar incompatibilidades entre ambas partes.
 
 Este README documenta el estado de la primera entrega funcional de Huellitas.
 No describe como terminadas las funciones reservadas para la Parte 2.
+
+Juan Diego Sotomayor
