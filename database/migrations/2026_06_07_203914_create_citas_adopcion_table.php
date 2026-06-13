@@ -11,8 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cita_adopcions', function (Blueprint $table) {
+        Schema::create('citas_adopcion', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('solicitud_adopcion_id')
+                ->unique()
+                ->constrained('solicitudes_adopcion');
+            $table->date('fecha');
+            $table->time('hora');
+            $table->string('lugar', 150);
+            $table->string('indicaciones', 255)->nullable();
+            $table->enum('estado', [
+                'programada',
+                'completada',
+                'cancelada',
+            ])->default('programada');
             $table->timestamps();
         });
     }
@@ -22,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cita_adopcions');
+        Schema::dropIfExists('citas_adopcion');
     }
 };

@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('razas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tipo_mascota_id')->constrained('tipos_mascotas');
+            $table->string('nombre', 80);
+            $table->string('descripcion', 255)->nullable();
             $table->timestamps();
+
+            $table->unique(['tipo_mascota_id', 'nombre']);
         });
     }
 

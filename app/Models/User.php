@@ -10,7 +10,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable([
+    'role_id',
+    'name',
+    'email',
+    'cedula',
+    'fecha_nacimiento',
+    'password',
+    'telefono',
+    'direccion',
+])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -26,7 +35,28 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'fecha_nacimiento' => 'date',
             'password' => 'hashed',
         ];
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function solicitudesAdopcion()
+    {
+        return $this->hasMany(SolicitudAdopcion::class, 'user_id');
+    }
+
+    public function respuestasAdministradas()
+    {
+        return $this->hasMany(RespuestaSolicitud::class, 'administrador_id');
+    }
+
+    public function esAdministrador(): bool
+    {
+        return $this->rol?->nombre === 'Administrador';
     }
 }

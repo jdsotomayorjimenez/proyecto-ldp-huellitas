@@ -11,9 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('imagen_mascotas', function (Blueprint $table) {
+        Schema::create('imagenes_mascotas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('mascota_id')->constrained('mascotas')->cascadeOnDelete();
+            $table->string('ruta', 255);
+            $table->boolean('es_principal')->default(false);
             $table->timestamps();
+
+            $table->unique(['mascota_id', 'ruta']);
         });
     }
 
@@ -22,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('imagen_mascotas');
+        Schema::dropIfExists('imagenes_mascotas');
     }
 };

@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('mascotas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('raza_id')->constrained('razas');
+            $table->string('nombre', 100);
+            $table->date('fecha_nacimiento')->nullable();
+            $table->enum('genero', ['macho', 'hembra']);
+            $table->enum('tamanio', ['pequeno', 'mediano', 'grande']);
+            $table->string('descripcion', 255)->nullable();
+            $table->enum('estado', [
+                'disponible',
+                'en_proceso',
+                'adoptada',
+                'no_disponible',
+            ])->default('disponible');
             $table->timestamps();
         });
     }
