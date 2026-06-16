@@ -20,17 +20,22 @@
 
     <div class="card card-huellitas">
         <div class="card-body p-4">
-            <h2 class="h4">Imágenes simples</h2>
+            <h2 class="h4">Imágenes</h2>
             <p class="texto-secundario">
-                Primero agrega el archivo en <code>public/img/mascotas/</code> y registra su ruta relativa.
+                Sube una fotografía real en formato JPG, PNG o WebP, con un máximo de 5 MB.
             </p>
             <form class="row g-3 align-items-end" method="POST"
+                  enctype="multipart/form-data"
                   action="{{ route('admin.mascotas.imagenes.store', $mascota) }}">
                 @csrf
                 <div class="col-md-7">
-                    <label class="form-label" for="ruta">Ruta</label>
-                    <input class="form-control" id="ruta" name="ruta"
-                           placeholder="img/mascotas/ejemplo.jpg" value="{{ old('ruta') }}" required>
+                    <label class="form-label" for="foto">Nueva fotografía</label>
+                    <input class="form-control @error('foto') is-invalid @enderror" id="foto"
+                           type="file" name="foto"
+                           accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                    @error('foto')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="col-md-3">
                     <div class="form-check mb-2">
@@ -41,6 +46,20 @@
                 </div>
                 <div class="col-md-2">
                     <button class="btn btn-huellitas w-100" type="submit">Asociar</button>
+                </div>
+                <div class="col-12">
+                    <details>
+                        <summary class="texto-secundario">Usar una imagen que ya existe en el proyecto</summary>
+                        <div class="mt-2">
+                            <label class="form-label" for="ruta">Ruta relativa dentro de public/</label>
+                            <input class="form-control @error('ruta') is-invalid @enderror" id="ruta"
+                                   name="ruta" placeholder="img/mascotas/catalogo-2026/ejemplo.jpg"
+                                   value="{{ old('ruta') }}">
+                            @error('ruta')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </details>
                 </div>
             </form>
 

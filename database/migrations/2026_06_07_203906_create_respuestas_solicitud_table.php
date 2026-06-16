@@ -18,7 +18,7 @@ return new class extends Migration
                 ->constrained('solicitudes_adopcion');
             $table->foreignId('administrador_id')->constrained('users');
             $table->enum('resultado', ['aprobada', 'rechazada']);
-            $table->string('respuesta', 255);
+            $table->text('respuesta');
             $table->date('fecha_respuesta');
             $table->timestamps();
         });

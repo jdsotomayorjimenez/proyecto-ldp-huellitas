@@ -57,4 +57,26 @@ class DatabaseContractTest extends TestCase
         $this->assertFalse(Schema::hasColumn('users', 'password_hash'));
         $this->assertTrue(Schema::hasColumn('requisitos_adopcion', 'tipo_mascota_id'));
     }
+
+    public function test_seeders_crean_los_datos_minimos_de_la_parte_uno(): void
+    {
+        $this->seed();
+
+        foreach (['Administrador', 'Adoptante'] as $rol) {
+            $this->assertDatabaseHas('roles', ['nombre' => $rol]);
+        }
+
+        foreach (['Perro', 'Gato', 'Conejo', 'Ave', 'Hámster'] as $tipo) {
+            $this->assertDatabaseHas('tipos_mascotas', ['nombre' => $tipo]);
+        }
+
+        foreach (['Luna', 'Max', 'Milo', 'Nala', 'Rocky'] as $mascota) {
+            $this->assertDatabaseHas('mascotas', ['nombre' => $mascota]);
+        }
+
+        $this->assertDatabaseHas('users', ['email' => 'admin@huellitas.com']);
+        $this->assertDatabaseHas('users', ['email' => 'adoptante@huellitas.com']);
+        $this->assertGreaterThanOrEqual(5, \App\Models\ImagenMascota::count());
+        $this->assertGreaterThan(0, \App\Models\RequisitoAdopcion::count());
+    }
 }

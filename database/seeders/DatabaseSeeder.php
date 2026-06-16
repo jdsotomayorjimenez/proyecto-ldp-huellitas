@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
             TipoMascotaSeeder::class,
             RazaSeeder::class,
             RequisitoAdopcionSeeder::class,
-            MascotaSeeder::class,
-            ImagenMascotaSeeder::class,
+            CatalogoDemoSeeder::class,
+            RazaDescripcionSeeder::class,
+            AdopcionDemoSeeder::class,
         ]);
     }
 }

@@ -10,24 +10,31 @@
     <link href="{{ asset('css/huellitas.css') }}" rel="stylesheet">
 </head>
 <body class="admin-body">
-    <nav class="navbar navbar-dark navbar-huellitas fixed-top shadow-sm">
+    <nav class="navbar navbar-huellitas fixed-top shadow-sm d-print-none">
         <div class="container-fluid">
             <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#adminSidebar" aria-controls="adminSidebar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand fw-bold" href="{{ route('admin.dashboard') }}">Huellitas Admin</a>
-            <div class="d-flex align-items-center gap-3 text-white">
-                <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ route('admin.dashboard') }}">
+                <img src="{{ asset('img/logo-huellitas-sf.png') }}" alt="" width="30" height="30">
+                Huellitas Admin
+            </a>
+            <div class="d-flex align-items-center gap-3 admin-user-area">
+                <span class="d-none d-md-inline">
+                    <i class="bi bi-person-circle me-1"></i>{{ auth()->user()->name }}
+                </span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button class="btn btn-outline-light btn-sm" type="submit">Salir</button>
+                    <button class="btn-salir-cafe btn-sm" type="submit">
+                        <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesión
+                    </button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <div class="offcanvas-lg offcanvas-start sidebar-huellitas admin-sidebar" tabindex="-1"
+    <div class="offcanvas-lg offcanvas-start sidebar-huellitas admin-sidebar d-print-none" tabindex="-1"
          id="adminSidebar" aria-labelledby="adminSidebarLabel">
         <div class="offcanvas-header border-bottom border-light">
             <h5 class="offcanvas-title" id="adminSidebarLabel">Menú administrativo</h5>
@@ -48,21 +55,32 @@
                    href="{{ route('admin.razas.index') }}">
                     <i class="bi bi-diagram-3 me-2"></i>Razas
                 </a>
+                <a class="nav-link {{ request()->routeIs('admin.requisitos.*') ? 'active' : '' }}"
+                   href="{{ route('admin.requisitos.index') }}">
+                    <i class="bi bi-card-checklist me-2"></i>Requisitos
+                </a>
                 <a class="nav-link {{ request()->routeIs('admin.mascotas.*') ? 'active' : '' }}"
                    href="{{ route('admin.mascotas.index') }}">
                     <i class="bi bi-heart me-2"></i>Mascotas
                 </a>
-                <a class="nav-link {{ request()->routeIs('admin.requisitos.*') ? 'active' : '' }}"
-                   href="{{ route('admin.requisitos.index') }}">
-                    <i class="bi bi-card-checklist me-2"></i>Requisitos
+                <a class="nav-link {{ request()->routeIs('admin.solicitudes.*') ? 'active' : '' }}"
+                   href="{{ route('admin.solicitudes.index') }}">
+                    <i class="bi bi-inbox me-2"></i>Solicitudes
+                </a>
+                <a class="nav-link {{ request()->routeIs('admin.citas.*') ? 'active' : '' }}"
+                   href="{{ route('admin.citas.index') }}">
+                    <i class="bi bi-calendar-event me-2"></i>Citas
+                </a>
+                <a class="nav-link {{ request()->routeIs('admin.adopciones.*') ? 'active' : '' }}"
+                   href="{{ route('admin.adopciones.index') }}">
+                    <i class="bi bi-house-heart me-2"></i>Adopciones
                 </a>
                 <a class="nav-link {{ request()->routeIs('admin.adoptantes.*') ? 'active' : '' }}"
                    href="{{ route('admin.adoptantes.create') }}">
                     <i class="bi bi-person-plus me-2"></i>Registrar adoptante
                 </a>
-                <hr class="border-light opacity-50">
-                <a class="nav-link" href="{{ route('home') }}">
-                    <i class="bi bi-house me-2"></i>Ir al inicio
+                <a class="nav-link nav-vista-principal mt-auto" href="{{ route('home') }}">
+                    <i class="bi bi-box-arrow-up-right me-2"></i>Vista principal
                 </a>
             </nav>
         </div>
