@@ -8,17 +8,30 @@ use App\Http\Requests\Admin\UpdateRazaRequest;
 use App\Models\Raza;
 use App\Models\TipoMascota;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RazaController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $tipos = TipoMascota::withCount('razas')
+            ->orderBy('nombre')
+            ->get();
+        $tipoSeleccionado = $tipos->firstWhere('id', $request->integer('tipo_mascota_id'))
+            ?? $tipos->first();
+
         return view('admin.razas.index', [
+            'tipos' => $tipos,
+            'tipoSeleccionado' => $tipoSeleccionado,
             'razas' => Raza::with('tipoMascota')
                 ->withCount('mascotas')
+                ->when($tipoSeleccionado, fn ($query) => $query->where(
+                    'tipo_mascota_id',
+                    $tipoSeleccionado->id,
+                ))
                 ->orderBy('nombre')
-                ->paginate(10),
+                ->get(),
         ]);
     }
 

@@ -5,26 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRequisitoAdopcionRequest;
 use App\Http\Requests\Admin\UpdateRequisitoAdopcionRequest;
+use App\Models\CumplimientoRequisito;
 use App\Models\RequisitoAdopcion;
 use App\Models\TipoMascota;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class RequisitoAdopcionController extends Controller
 {
     public function index(Request $request): View
     {
-        $requisitos = RequisitoAdopcion::with('tipoMascota')
+        $tipos = TipoMascota::orderBy('nombre')->get();
+
+        // Sin tipo en la URL => vista general (requisitos que aplican a todos los tipos).
+        $tipoSeleccionado = $tipos->firstWhere('id', $request->integer('tipo_mascota_id'));
+        $esGeneral = $tipoSeleccionado === null;
+
+        $consulta = RequisitoAdopcion::with('tipoMascota')
             ->withCount('cumplimientos')
-            ->when(
-                $request->filled('tipo_mascota_id'),
-                fn ($query) => $query->where(
-                    'tipo_mascota_id',
-                    $request->integer('tipo_mascota_id'),
-                ),
-            )
+            ->when($tipoSeleccionado, fn ($query) => $query->where(
+                'tipo_mascota_id',
+                $tipoSeleccionado->id,
+            ))
             ->when(
                 $request->filled('estado'),
                 fn ($query) => $query->where('estado', $request->string('estado')),
@@ -37,15 +42,81 @@ class RequisitoAdopcionController extends Controller
                         ->orWhere('descripcion', 'like', '%'.$request->string('buscar')->trim().'%'),
                 ),
             )
-            ->orderBy('nombre')
-            ->orderBy('tipo_mascota_id')
-            ->paginate(10)
-            ->withQueryString();
+            ->orderBy('nombre');
+
+        if ($esGeneral) {
+            // Generales: el mismo requisito (por nombre) existe en todos los tipos.
+            $totalTipos = $tipos->count();
+            $requisitos = $consulta->get()
+                ->groupBy('nombre')
+                ->filter(fn ($grupo) => $grupo->pluck('tipo_mascota_id')->unique()->count() >= $totalTipos)
+                ->map(fn ($grupo) => $grupo->first())
+                ->values();
+        } else {
+            $requisitos = $consulta->get();
+        }
 
         return view('admin.requisitos.index', [
             'requisitos' => $requisitos,
-            'tipos' => TipoMascota::orderBy('nombre')->get(),
+            'tipos' => $tipos,
+            'tipoSeleccionado' => $tipoSeleccionado,
+            'esGeneral' => $esGeneral,
+            'nombresRequisitos' => RequisitoAdopcion::query()
+                ->when($tipoSeleccionado, fn ($query) => $query->where(
+                    'tipo_mascota_id',
+                    $tipoSeleccionado->id,
+                ))
+                ->orderBy('nombre')
+                ->distinct()
+                ->pluck('nombre'),
         ]);
+    }
+
+    public function editGeneral(RequisitoAdopcion $requisito): View
+    {
+        return view('admin.requisitos.edit-general', [
+            'requisito' => $requisito,
+            'tiposAfectados' => RequisitoAdopcion::where('nombre', $requisito->nombre)
+                ->distinct('tipo_mascota_id')
+                ->count('tipo_mascota_id'),
+        ]);
+    }
+
+    public function updateGeneral(Request $request, RequisitoAdopcion $requisito): RedirectResponse
+    {
+        $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:100'],
+            'descripcion' => ['nullable', 'string', 'max:255'],
+            'estado' => ['required', Rule::in(['activo', 'inactivo'])],
+        ]);
+        $obligatorio = $request->boolean('obligatorio');
+
+        RequisitoAdopcion::where('nombre', $requisito->nombre)->update([
+            'nombre' => $datos['nombre'],
+            'descripcion' => $datos['descripcion'] ?? null,
+            'estado' => $datos['estado'],
+            'obligatorio' => $obligatorio,
+        ]);
+
+        return redirect()
+            ->route('admin.requisitos.index')
+            ->with('success', 'Requisito general actualizado en todos los tipos.');
+    }
+
+    public function destroyGeneral(RequisitoAdopcion $requisito): RedirectResponse
+    {
+        $ids = RequisitoAdopcion::where('nombre', $requisito->nombre)->pluck('id');
+
+        if (CumplimientoRequisito::whereIn('requisito_adopcion_id', $ids)->exists()) {
+            return back()->with(
+                'error',
+                'No se puede eliminar: algún tipo ya tiene revisiones asociadas a este requisito.',
+            );
+        }
+
+        RequisitoAdopcion::whereIn('id', $ids)->delete();
+
+        return back()->with('success', 'Requisito general eliminado de todos los tipos.');
     }
 
     public function create(): View

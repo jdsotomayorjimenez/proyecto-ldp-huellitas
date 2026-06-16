@@ -1,194 +1,182 @@
-# Huellitas - Parte 1
+# Huellitas — Sistema de Gestión de Adopciones de Mascotas
 
-Juan Diego Sotomayor
+Plataforma integral desarrollada en Laravel para la gestión del proceso de adopción de mascotas, desde la administración del catálogo hasta la formalización del acta de adopción.
 
-## Descripción general
+---
 
-Huellitas es una aplicación web desarrollada con Laravel para apoyar la
-gestión de adopciones de mascotas. Esta versión corresponde a la Parte 1 del
-proyecto y establece la base relacional, administrativa y de seguridad que
-necesita el flujo de adopción.
+## Descripción
 
-La aplicación todavía no representa la entrega final. El catálogo público y
-el proceso completo de solicitudes, citas, cumplimientos y adopciones
-corresponden a una segunda etapa.
+**Huellitas** es una aplicación web enfocada en la automatización y formalización del flujo de adopción. El sistema permite la consulta de un catálogo de registros, procesamiento de solicitudes y seguimiento de estados, proporcionando a los administradores herramientas para la gestión de entidades, evaluación de candidatos, programación de citas y verificación del cumplimiento de requisitos legales y de bienestar animal.
 
-## Objetivo de esta entrega
+| Parte | Responsable | Descripción general |
+| --- | --- | --- |
+| Parte 1 — Arquitectura de Datos y Backend | Juan Diego Sotomayor | Diseño y construcción de la base de datos relacional, modelos Eloquent y poblado inicial de datos (seeders). |
+| Parte 2 — Interfaz y Lógica de Negocio | Karel González | Desarrollo de la interfaz de usuario, controladores, validaciones y lógica de transición de estados. |
 
-La Parte 1 tiene como objetivo proporcionar una base estable para que el
-administrador pueda gestionar la información principal del sistema y para que
-la Parte 2 pueda utilizar las migraciones, modelos, relaciones y datos
-iniciales sin redefinir el modelo relacional.
+---
 
-## Alcance implementado
+## Arquitectura General
 
-- Modelo relacional de las 12 tablas definidas para Huellitas.
-- Migraciones con claves foráneas, restricciones y marcas de tiempo.
-- Modelos Eloquent con relaciones, asignación masiva y conversiones de tipos.
-- Seeders para roles, usuarios, tipos, razas, mascotas, requisitos e imágenes.
-- Inicio y cierre de sesión.
-- Registro público de usuarios con rol Adoptante.
-- Registro de adoptantes desde el panel administrativo.
-- Autorización del panel mediante los roles Administrador y Adoptante.
-- Middleware para proteger las rutas administrativas.
-- Dashboard con resumen de los registros principales.
-- CRUD administrativo de tipos de mascotas.
-- CRUD administrativo de razas.
-- CRUD administrativo de mascotas.
-- CRUD administrativo de requisitos de adopción.
-- Asociación simple de imágenes ubicadas en `public/img/mascotas/`.
-- Interfaz administrativa con Blade y Bootstrap 5.
+El sistema implementa el patrón de arquitectura Modelo-Vista-Controlador (MVC) utilizando el framework Laravel, con Eloquent ORM para la capa de persistencia de datos y MariaDB como motor de base de datos relacional.
 
-## Funcionalidades principales
+```text
+[Cliente]
+   ↓
+[Capa de Presentación (Blade / Bootstrap 5)]
+   ↓
+[Enrutador / Controladores]
+   ↓
+[Capa de Persistencia (Eloquent ORM) / MariaDB]
+```
 
-### Seguridad y roles
+### Distribución de Componentes
 
-Los administradores y adoptantes se almacenan en la tabla `users` y se
-diferencian mediante la tabla `roles`. No existe una tabla separada para
-administradores. Las contraseñas se almacenan mediante el sistema de hash de
-Laravel.
+```text
+[Juan Diego Sotomayor]
+└── Parte 1: Base de Datos y Estructura
+    ├── Diseño del Modelo Relacional (12 tablas)
+    ├── Implementación de Migraciones y Restricciones
+    └── Definición de Modelos y Relaciones Eloquent
 
-Las rutas del panel usan los middleware `auth` y `admin`. Un adoptante
-autenticado no puede acceder a los módulos administrativos.
+[Karel González]
+└── Parte 2: Lógica y Frontend
+    ├── Desarrollo de Vistas y Estilos
+    ├── Lógica de Controladores y Flujo de Estados
+    └── Implementación de Validaciones y Seguridad
+```
 
-### Gestión administrativa
+---
 
-El panel permite consultar y mantener tipos de mascotas, razas, mascotas y
-requisitos. Los tipos y las razas que ya están relacionados con mascotas no se
-pueden eliminar.
+## Flujo del Sistema
 
-En el formulario de mascotas primero se selecciona el tipo y después una raza.
-El selector de raza incluye búsqueda instantánea y solo muestra las opciones
-del tipo elegido.
+```text
+[Selección de mascota en catálogo]
+   ↓
+[Creación de Solicitud de Adopción]
+   ↓
+[Evaluación Administrativa (Aprobación/Rechazo)]
+   ↓
+[Generación de Cita y Asignación de Requisitos]
+   ↓
+[Verificación de Cumplimiento de Requisitos]
+   ↓
+[Registro de Transacción Final (Adopción)]
+```
 
-### Requisitos de adopción
+---
 
-Los requisitos pueden registrarse para un tipo concreto o generarse para todos
-los tipos existentes. En ambos casos se conserva el campo obligatorio
-`tipo_mascota_id`. Cuando el requisito es general, el administrador puede
-indicar para cuáles tipos será obligatorio.
+## Stack Tecnológico
 
-### Imágenes de mascotas
+| Componente | Tecnología |
+| --- | --- |
+| Lógica de Servidor | PHP 8.3 / Laravel 13 |
+| Motor de Base de Datos | MariaDB |
+| Capa de Presentación | Blade / Bootstrap 5 / CSS3 |
+| Pruebas Unitarias | PHPUnit |
+| Empaquetador de Módulos | Vite / Node.js |
 
-La gestión de imágenes es intencionalmente sencilla. Los archivos se colocan
-en `public/img/mascotas/` y el panel registra su ruta relativa, además de
-permitir indicar una imagen principal.
+---
 
-## Funcionalidades pendientes
+## Estructura del Repositorio
 
-La Parte 2 debe completar:
+```text
+proyecto-huellitas/
+├── app/
+│   ├── Http/Controllers/      # Controladores y lógica de negocio
+│   ├── Models/                # Modelos ORM
+│   └── Middleware/            # Filtros de interceptación
+├── database/
+│   ├── migrations/            # Esquemas de base de datos
+│   └── seeders/               # Scripts de inserción de datos
+├── resources/
+│   └── views/                 # Plantillas de renderizado
+├── public/
+│   ├── css/                   # Hojas de estilo compiladas
+│   └── img/mascotas/          # Almacenamiento de imágenes
+└── README.md
+```
 
-- Layout y navegación pública.
-- Catálogo público de mascotas.
-- Formulario y seguimiento de solicitudes de adopción.
-- Revisión y respuesta de solicitudes.
-- Programación y gestión de citas.
-- Registro de cumplimiento de requisitos.
-- Registro final de adopciones.
+---
 
-Estas funcionalidades no se presentan como implementadas en esta entrega.
+## Parte 1 — Arquitectura de Datos y Backend
 
-## Tecnologías utilizadas
+Responsable: **Juan Diego Sotomayor**
 
-| Tecnología | Uso en el proyecto |
-|---|---|
-| PHP 8.3 o superior | Lenguaje principal |
-| Laravel 13 | Framework de la aplicación |
-| MariaDB/MySQL | Persistencia de datos |
-| Eloquent ORM | Modelos y relaciones |
-| Blade | Plantillas del servidor |
-| Bootstrap 5 | Interfaz y componentes visuales |
-| JavaScript | Interacciones básicas de formularios |
-| Vite y Node.js | Gestión y compilación de recursos |
-| PHPUnit | Pruebas automatizadas |
-| Git | Control de versiones y trabajo por ramas |
+### Descripción
 
-## Estructura principal del proyecto
+Construcción del modelo relacional normalizado para soportar la integridad transaccional del flujo de adopción.
 
-| Ruta | Contenido |
-|---|---|
-| `app/Models/` | Modelos y relaciones Eloquent |
-| `app/Http/Controllers/Admin/` | Controladores del panel administrativo |
-| `app/Http/Controllers/Auth/` | Inicio de sesión, registro y cierre de sesión |
-| `app/Http/Middleware/` | Middleware de autorización administrativa |
-| `app/Http/Requests/` | Validaciones de formularios |
-| `database/migrations/` | Definición de tablas y claves foráneas |
-| `database/seeders/` | Datos iniciales para desarrollo |
-| `resources/views/admin/` | Vistas de dashboard y CRUD administrativos |
-| `resources/views/auth/` | Formularios de autenticación y registro |
-| `resources/views/layouts/` | Layouts compartidos |
-| `public/css/huellitas.css` | Estilos base de la aplicación |
-| `public/img/mascotas/` | Imágenes simples de mascotas |
-| `routes/web.php` | Rutas públicas, de autenticación y administrativas |
-| `tests/Feature/` | Pruebas de base de datos, seguridad y CRUD |
+### Responsabilidades principales
 
-## Requisitos previos
+* Diseño de esquema relacional de 12 tablas interconectadas.
+* Programación de migraciones con restricciones de integridad referencial estricta.
+* Configuración de modelos Eloquent (`belongsTo`, `hasMany`, `hasOne`) con lógica de negocio integrada.
+* Desarrollo de seeders para la automatización del estado inicial del catálogo y usuarios.
 
-- PHP 8.3 o superior con la extensión `pdo_mysql`.
-- Composer.
-- MariaDB o MySQL.
-- Node.js y npm.
-- Git.
+---
 
-Para comprobar la extensión de base de datos:
+## Parte 2 — Interfaz y Lógica de Negocio
+
+Responsable: **Karel González**
+
+### Descripción
+
+Implementación de la interfaz de usuario, control de acceso y codificación de las reglas de negocio del sistema.
+
+### Responsabilidades principales
+
+* Desarrollo de las interfaces responsivas para cliente y panel de administración.
+* Implementación de autenticación y control de acceso basado en roles (RBAC).
+* Programación de la máquina de estados para el ciclo de vida de las solicitudes (Pendiente, Aprobada, Rechazada, Adoptada).
+* Generación de la lógica para el seguimiento de requisitos y cierre de adopciones.
+
+---
+
+## Integración de Componentes
+
+La capa de presentación (Parte 2) se comunica con la capa de datos (Parte 1) a través de las abstracciones proporcionadas por Eloquent ORM.
+
+| Proceso | Flujo de Integración |
+| --- | --- |
+| Suministro | Parte 1 provee la estructura relacional y los datos iniciales. |
+| Consumo | Parte 2 instancia objetos y colecciones a partir de los modelos. |
+| Mutación | Parte 2 aplica las reglas de negocio y modifica el estado de los objetos. |
+| Persistencia | Parte 1 asegura la integridad referencial al confirmar las transacciones. |
+
+---
+
+## Decisiones de Ingeniería de Software
+
+* **Framework Laravel**: Seleccionado por la eficiencia en la gestión del ORM y los mecanismos de seguridad integrados (protección CSRF, inyección SQL, XSS).
+* **Control de Acceso**: Consolidación de entidades de usuario en una única tabla con diferenciación mediante el atributo `role_id` para simplificar la autenticación.
+* **Integridad de Datos**: Aplicación de restricciones de borrado (`onDelete('restrict')`) en tablas de catálogo (tipos, razas) para prevenir inconsistencias en registros históricos.
+* **Arquitectura de Trabajo**: Separación estricta de las capas de persistencia y presentación para habilitar el desarrollo concurrente y modular.
+
+---
+
+## Instalación y Ejecución
 
 ```bash
-php -m | grep -i pdo_mysql
-```
-
-## Configuración de la base de datos
-
-El nombre utilizado por defecto es `huellitas_db`. Puede crearse desde el
-cliente de MariaDB/MySQL:
-
-```sql
-CREATE DATABASE huellitas_db
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-```
-
-El archivo `.env.example` está preparado para MariaDB y no contiene
-contraseñas. Después de crear `.env`, configura las credenciales locales:
-
-```dotenv
-DB_CONNECTION=mariadb
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=huellitas_db
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-Si se utiliza MySQL, `DB_CONNECTION` puede cambiarse a `mysql`.
-
-## Instalación y configuración
-
-```bash
+# Clonación del repositorio
 git clone https://github.com/jdsotomayorjimenez/proyecto_ldp.git
 cd proyecto_ldp
+
+# Instalación de dependencias
 composer install
 npm install
+
+# Configuración de entorno
 cp .env.example .env
 php artisan key:generate
-php artisan config:clear
-```
 
-El archivo `.env` contiene configuración local y está excluido del repositorio.
-
-## Migraciones y datos iniciales
-
-Para construir la base y cargar los datos de desarrollo:
-
-```bash
+# Migración de esquemas e inicialización de datos
 php artisan migrate:fresh --seed
+
+# Ejecución del servidor de desarrollo
+php artisan serve
 ```
 
-Este comando elimina las tablas existentes de la base configurada antes de
-recrearlas. Debe ejecutarse únicamente sobre una base local de desarrollo.
-
-Los tipos iniciales son Perro, Gato, Conejo y Ave. Se pueden crear tipos
-concretos adicionales desde el panel; no se utiliza una categoría genérica
-`Otro`.
+---
 
 ## Credenciales de prueba
 
@@ -197,85 +185,10 @@ concretos adicionales desde el panel; no se utiliza una categoría genérica
 | Administrador | `admin@huellitas.com` | `password` |
 | Adoptante | `adoptante@huellitas.com` | `password` |
 
-Estas credenciales se generan mediante seeders y son exclusivamente para
-desarrollo.
+---
 
-## Ejecución del proyecto
+## Nota de Autoría
 
-Inicia el servidor de Laravel:
+Este proyecto representa el esfuerzo conjunto para modernizar la gestión de adopciones, dividiendo el trabajo en una base de datos sólida y una lógica de negocio interactiva.
 
-```bash
-php artisan serve
-```
-
-La aplicación estará disponible normalmente en
-`http://127.0.0.1:8000`.
-
-Los layouts actuales cargan Bootstrap mediante CDN. Para trabajar con los
-recursos administrados por Vite también puede ejecutarse:
-
-```bash
-npm run dev
-```
-
-Rutas principales:
-
-| Ruta | Función |
-|---|---|
-| `/` | Página de inicio |
-| `/login` | Inicio de sesión |
-| `/registro` | Registro público de adoptantes |
-| `/admin/dashboard` | Dashboard administrativo |
-| `/admin/tipos-mascotas` | Gestión de tipos |
-| `/admin/razas` | Gestión de razas |
-| `/admin/mascotas` | Gestión de mascotas e imágenes |
-| `/admin/requisitos` | Gestión de requisitos |
-| `/admin/adoptantes/crear` | Registro administrativo de adoptantes |
-
-## Verificación
-
-Comandos útiles para revisar la instalación:
-
-```bash
-php artisan about
-php artisan route:list
-php artisan migrate:status
-npm run build
-```
-
-Las pruebas utilizan `RefreshDatabase`, por lo que deben ejecutarse sobre una
-base temporal y no sobre `huellitas_db`:
-
-```bash
-mariadb -u root -p -e \
-  "CREATE DATABASE huellitas_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-DB_CONNECTION=mariadb DB_DATABASE=huellitas_test php artisan test
-
-mariadb -u root -p -e "DROP DATABASE huellitas_test;"
-```
-
-Las pruebas automatizadas cubren el contrato de la base de datos, la
-autenticación, la autorización administrativa y operaciones principales de
-los CRUD.
-
-## Estado actual
-
-La Parte 1 está implementada como primera entrega funcional. Proporciona la
-base administrativa y relacional necesaria para que la rama encargada de la
-Parte 2 continúe con la experiencia pública y el flujo completo de adopción.
-
-La distribución acordada es:
-
-- `branch-jd`: Parte 1, base de datos, modelos, seguridad y administración.
-- `branch-kg`: Parte 2, vista pública y flujo completo de adopción.
-
-Las migraciones, modelos y seeders compartidos deben modificarse de forma
-coordinada para evitar incompatibilidades entre ambas partes.
-
-## Nota final
-
-Este README documenta el estado de la primera entrega funcional de Huellitas.
-No describe como terminadas las funciones reservadas para la Parte 2.
-
-Juan Diego Sotomayor
+**Juan Diego Sotomayor** | **Karel González**

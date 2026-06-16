@@ -5,7 +5,7 @@
         <option value="">Selecciona un tipo</option>
         @foreach ($tipos as $tipo)
             <option value="{{ $tipo->id }}"
-                @selected((int) old('tipo_mascota_id', $raza->tipo_mascota_id ?? 0) === $tipo->id)>
+                @selected((int) old('tipo_mascota_id', $raza->tipo_mascota_id ?? request('tipo_mascota_id', 0)) === $tipo->id)>
                 {{ $tipo->nombre }}
             </option>
         @endforeach

@@ -14,6 +14,7 @@ class TipoMascotaSeeder extends Seeder
             'Gato' => 'Gatos disponibles para adopción.',
             'Conejo' => 'Conejos disponibles para adopción.',
             'Ave' => 'Aves disponibles para adopción.',
+            'Hámster' => 'Hámsters disponibles para adopción.',
         ];
 
         foreach ($tipos as $nombre => $descripcion) {

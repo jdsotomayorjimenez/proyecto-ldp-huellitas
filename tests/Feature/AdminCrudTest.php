@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ImagenMascota;
 use App\Models\Mascota;
 use App\Models\Raza;
 use App\Models\RequisitoAdopcion;
@@ -9,6 +10,8 @@ use App\Models\Role;
 use App\Models\TipoMascota;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class AdminCrudTest extends TestCase
@@ -187,5 +190,83 @@ class AdminCrudTest extends TestCase
             ->assertSee('Selecciona primero un tipo')
             ->assertSee('Escribe para filtrar razas')
             ->assertSee('"nombre":"Dorado"', false);
+    }
+
+    public function test_administrador_puede_modificar_datos_de_una_mascota(): void
+    {
+        $tipo = TipoMascota::create(['nombre' => 'Perro']);
+        $raza = Raza::create([
+            'tipo_mascota_id' => $tipo->id,
+            'nombre' => 'Mestizo',
+        ]);
+        $mascota = Mascota::create([
+            'raza_id' => $raza->id,
+            'nombre' => 'Luna',
+            'fecha_nacimiento' => '2022-01-01',
+            'genero' => 'hembra',
+            'tamanio' => 'mediano',
+            'descripcion' => 'Descripción anterior',
+            'estado' => 'disponible',
+        ]);
+
+        $this->actingAs($this->administrador)
+            ->put(route('admin.mascotas.update', $mascota), [
+                'raza_id' => $raza->id,
+                'nombre' => 'Luna Nueva',
+                'fecha_nacimiento' => '2021-06-10',
+                'genero' => 'hembra',
+                'tamanio' => 'grande',
+                'descripcion' => 'Descripción actualizada',
+                'estado' => 'no_disponible',
+            ])
+            ->assertRedirect(route('admin.mascotas.index'));
+
+        $this->assertDatabaseHas('mascotas', [
+            'id' => $mascota->id,
+            'nombre' => 'Luna Nueva',
+            'tamanio' => 'grande',
+            'descripcion' => 'Descripción actualizada',
+            'estado' => 'no_disponible',
+        ]);
+    }
+
+    public function test_administrador_puede_subir_y_eliminar_foto_de_una_mascota(): void
+    {
+        $tipo = TipoMascota::create(['nombre' => 'Gato']);
+        $raza = Raza::create([
+            'tipo_mascota_id' => $tipo->id,
+            'nombre' => 'Mestizo',
+        ]);
+        $mascota = Mascota::create([
+            'raza_id' => $raza->id,
+            'nombre' => 'Milo',
+            'genero' => 'macho',
+            'tamanio' => 'pequeno',
+            'estado' => 'disponible',
+        ]);
+
+        $this->actingAs($this->administrador)
+            ->post(route('admin.mascotas.imagenes.store', $mascota), [
+                'foto' => UploadedFile::fake()->createWithContent(
+                    'milo.png',
+                    base64_decode(
+                        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+                        true,
+                    ),
+                ),
+                'es_principal' => '1',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $imagen = ImagenMascota::where('mascota_id', $mascota->id)->firstOrFail();
+        $this->assertTrue($imagen->es_principal);
+        $this->assertFileExists(public_path($imagen->ruta));
+
+        $this->actingAs($this->administrador)
+            ->delete(route('admin.imagenes.destroy', $imagen))
+            ->assertSessionHasNoErrors();
+
+        $this->assertFileDoesNotExist(public_path($imagen->ruta));
+        File::deleteDirectory(public_path('img/mascotas/uploads'));
     }
 }
