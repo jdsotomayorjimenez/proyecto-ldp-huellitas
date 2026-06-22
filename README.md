@@ -1,194 +1,338 @@
-# Huellitas — Sistema de Gestión de Adopciones de Mascotas
+# Huellitas — Sistema web para la gestión de adopciones de mascotas
 
-Plataforma integral desarrollada en Laravel para la gestión del proceso de adopción de mascotas, desde la administración del catálogo hasta la formalización del acta de adopción.
+**Huellitas** es una aplicación web desarrollada en Laravel para apoyar la gestión de adopciones de mascotas en un refugio o centro de adopción. El sistema permite publicar mascotas disponibles, registrar adoptantes, recibir solicitudes, revisar cada caso desde un panel administrativo, agendar citas, validar requisitos y formalizar la adopción mediante un certificado o acta.
 
 ---
 
 ## Descripción
 
-**Huellitas** es una aplicación web enfocada en la automatización y formalización del flujo de adopción. El sistema permite la consulta de un catálogo de registros, procesamiento de solicitudes y seguimiento de estados, proporcionando a los administradores herramientas para la gestión de entidades, evaluación de candidatos, programación de citas y verificación del cumplimiento de requisitos legales y de bienestar animal.
+El proyecto centraliza el proceso de adopción en una plataforma web con dos perfiles principales: el adoptante y el administrador. Desde la vista pública, una persona puede consultar el catálogo de mascotas, revisar información detallada de cada animal y enviar una solicitud de adopción. Desde el panel administrativo, el refugio puede administrar catálogos, revisar solicitudes, aprobar o rechazar postulaciones, programar citas, verificar requisitos y registrar la adopción final.
 
-| Parte | Responsable | Descripción general |
+Huellitas busca ordenar el flujo operativo de un refugio, reducir el manejo manual de información y dejar trazabilidad del proceso desde la publicación de una mascota hasta la generación del acta de adopción.
+
+---
+
+## Contexto académico
+
+Este proyecto fue desarrollado como entrega académica por dos integrantes y cumple con los criterios solicitados para una aplicación web con Laravel:
+
+| Requisito | Implementación en Huellitas |
+| --- | --- |
+| Aplicación Laravel | Estructura MVC con rutas, controladores, modelos Eloquent, migraciones y seeders. |
+| Vistas con Bootstrap | Interfaces Blade con Bootstrap 5 y estilos propios para la vista pública, autenticación y panel administrativo. |
+| Repositorio Git | Proyecto versionado en Git y publicado en GitHub. |
+| Ramas por integrante/característica | Trabajo dividido en `branch-jd` y `branch-kg`. |
+| Modelo relacional coherente | Base de datos organizada en 12 tablas principales relacionadas con el flujo de adopción. |
+| Modelos relacionados | Modelos Eloquent con relaciones entre usuarios, mascotas, solicitudes, citas, requisitos y adopciones. |
+| Autenticación | Inicio de sesión, registro, cierre de sesión y control de acceso por rol. |
+| Navegación entre páginas | Flujo navegable entre inicio, catálogo, detalle, solicitudes del adoptante y módulos administrativos. |
+
+---
+
+## Distribución del trabajo
+
+| Rama | Parte | Alcance principal |
 | --- | --- | --- |
-| Parte 1 — Arquitectura de Datos y Backend | Juan Diego Sotomayor | Diseño y construcción de la base de datos relacional, modelos Eloquent y poblado inicial de datos (seeders). |
-| Parte 2 — Interfaz y Lógica de Negocio | Karel González | Desarrollo de la interfaz de usuario, controladores, validaciones y lógica de transición de estados. |
+| `branch-jd` | Parte 1 | Base del sistema, modelo relacional, seguridad, roles, panel administrador y CRUD base. |
+| `branch-kg` | Parte 2 | Vista pública, catálogo, solicitudes, citas, requisitos, adopciones y certificado/acta. |
 
 ---
 
-## Arquitectura General
+## Flujo general del sistema
 
-El sistema implementa el patrón de arquitectura Modelo-Vista-Controlador (MVC) utilizando el framework Laravel, con Eloquent ORM para la capa de persistencia de datos y MariaDB como motor de base de datos relacional.
-
-```text
-[Cliente]
-   ↓
-[Capa de Presentación (Blade / Bootstrap 5)]
-   ↓
-[Enrutador / Controladores]
-   ↓
-[Capa de Persistencia (Eloquent ORM) / MariaDB]
-```
-
-### Distribución de Componentes
-
-```text
-[Juan Diego Sotomayor]
-└── Parte 1: Base de Datos y Estructura
-    ├── Diseño del Modelo Relacional (12 tablas)
-    ├── Implementación de Migraciones y Restricciones
-    └── Definición de Modelos y Relaciones Eloquent
-
-[Karel González]
-└── Parte 2: Lógica y Frontend
-    ├── Desarrollo de Vistas y Estilos
-    ├── Lógica de Controladores y Flujo de Estados
-    └── Implementación de Validaciones y Seguridad
-```
+1. El refugio registra una mascota y la marca como disponible.
+2. El adoptante inicia sesión en el sistema.
+3. El adoptante revisa el catálogo y envía una solicitud de adopción.
+4. El administrador revisa la solicitud desde el panel administrativo.
+5. El administrador aprueba y agenda una cita, o rechaza la solicitud con una respuesta.
+6. El administrador verifica los requisitos asociados al proceso de adopción.
+7. El administrador registra la adopción final cuando el proceso se completa.
+8. El sistema muestra el certificado o acta de adopción correspondiente.
 
 ---
 
-## Flujo del Sistema
+## Roles del sistema
 
-```text
-[Selección de mascota en catálogo]
-   ↓
-[Creación de Solicitud de Adopción]
-   ↓
-[Evaluación Administrativa (Aprobación/Rechazo)]
-   ↓
-[Generación de Cita y Asignación de Requisitos]
-   ↓
-[Verificación de Cumplimiento de Requisitos]
-   ↓
-[Registro de Transacción Final (Adopción)]
-```
-
----
-
-## Stack Tecnológico
-
-| Componente | Tecnología |
+| Rol | Descripción |
 | --- | --- |
-| Lógica de Servidor | PHP 8.3 / Laravel 13 |
-| Motor de Base de Datos | MariaDB |
-| Capa de Presentación | Blade / Bootstrap 5 / CSS3 |
-| Pruebas Unitarias | PHPUnit |
-| Empaquetador de Módulos | Vite / Node.js |
+| Administrador | Gestiona catálogos, mascotas, requisitos, solicitudes, citas, verificaciones y adopciones. Tiene acceso al panel administrativo. |
+| Adoptante | Consulta la vista pública, se registra, inicia sesión, solicita adoptar una mascota y revisa el estado de sus solicitudes o adopciones. |
 
 ---
 
-## Estructura del Repositorio
+## Funcionalidades principales
+
+* Login, registro y cierre de sesión.
+* Panel administrador con indicadores y gráficas.
+* Gestión de tipos de mascotas.
+* Gestión de razas por tipo de mascota.
+* Gestión de mascotas y sus datos principales.
+* Gestión de requisitos de adopción.
+* Catálogo público de mascotas disponibles.
+* Vista de detalle de mascota.
+* Envío de solicitudes de adopción.
+* Aprobación o rechazo de solicitudes.
+* Agenda y seguimiento de citas.
+* Verificación de requisitos por solicitud.
+* Registro de adopciones finalizadas.
+* Visualización y descarga del certificado o acta de adopción.
+
+---
+
+## Modelo relacional
+
+El sistema trabaja con 12 tablas principales para representar el proceso de adopción:
+
+| Tabla | Propósito |
+| --- | --- |
+| `roles` | Define los perfiles de acceso del sistema, como administrador y adoptante. |
+| `users` | Almacena los datos de los usuarios, credenciales, información personal y rol asignado. |
+| `tipos_mascotas` | Registra categorías generales de mascotas, por ejemplo perro, gato, ave u otros tipos. |
+| `razas` | Registra razas asociadas a un tipo de mascota. |
+| `mascotas` | Almacena la información principal de cada mascota: nombre, raza, edad, género, tamaño, descripción y estado. |
+| `imagenes_mascotas` | Guarda las rutas de imágenes asociadas a las mascotas y permite identificar una imagen principal. |
+| `solicitudes_adopcion` | Registra las solicitudes enviadas por adoptantes para una mascota específica. |
+| `respuestas_solicitud` | Guarda la respuesta administrativa de una solicitud, indicando si fue aprobada o rechazada. |
+| `citas_adopcion` | Registra citas asociadas a solicitudes aprobadas, incluyendo fecha, hora, lugar, indicaciones y estado. |
+| `requisitos_adopcion` | Define los requisitos que deben cumplirse para adoptar, asociados a tipos de mascota. |
+| `cumplimientos_requisitos` | Registra la revisión de cada requisito dentro de una solicitud de adopción. |
+| `adopciones` | Formaliza la adopción final, vinculando la solicitud aprobada con fecha, número de acta y observaciones. |
+
+---
+
+## Stack tecnológico
+
+| Componente | Tecnología usada |
+| --- | --- |
+| Framework backend | Laravel 13 |
+| Lenguaje backend | PHP 8.3 |
+| Plantillas | Blade |
+| Interfaz | Bootstrap 5, Bootstrap Icons y CSS propio |
+| Base de datos | MariaDB/MySQL |
+| ORM | Eloquent |
+| Dependencias PHP | Composer |
+| Assets frontend | NPM y Vite |
+| Control de versiones | Git y GitHub |
+
+---
+
+## Estructura del repositorio
 
 ```text
-proyecto-huellitas/
-├── app/
-│   ├── Http/Controllers/      # Controladores y lógica de negocio
-│   ├── Models/                # Modelos ORM
-│   └── Middleware/            # Filtros de interceptación
+proyecto-ldp-huellitas/
+├── app/                    # Modelos, controladores, middleware y lógica principal de Laravel
 ├── database/
-│   ├── migrations/            # Esquemas de base de datos
-│   └── seeders/               # Scripts de inserción de datos
+│   ├── migrations/         # Definición del esquema relacional
+│   └── seeders/            # Datos iniciales y usuarios de demostración
 ├── resources/
-│   └── views/                 # Plantillas de renderizado
-├── public/
-│   ├── css/                   # Hojas de estilo compiladas
-│   └── img/mascotas/          # Almacenamiento de imágenes
-└── README.md
+│   └── views/              # Vistas Blade públicas, de autenticación y administración
+├── routes/                 # Definición de rutas web
+├── public/                 # Punto de entrada, CSS público e imágenes usadas por la aplicación
+├── capturas/               # Imágenes usadas como evidencia visual del sistema
+├── docs/                   # Documentación complementaria en PDF
+├── composer.json           # Dependencias y scripts PHP/Laravel
+├── package.json            # Dependencias y scripts NPM/Vite
+└── README.md               # Documentación principal del proyecto
 ```
 
 ---
 
-## Parte 1 — Arquitectura de Datos y Backend
+## Capturas del sistema
 
-Responsable: **Juan Diego Sotomayor**
+Las siguientes capturas se encuentran en la carpeta `capturas/`. El orden y la descripción se organizaron usando como referencia el archivo `docs/Capturas - Huellitas.pdf` y los nombres reales de los archivos disponibles.
 
-### Descripción
+### Portada
 
-Construcción del modelo relacional normalizado para soportar la integridad transaccional del flujo de adopción.
+![Landing page](capturas/1.png)
 
-### Responsabilidades principales
+La pantalla principal presenta la identidad visual de Huellitas y dirige al usuario hacia el catálogo de mascotas disponibles.
 
-* Diseño de esquema relacional de 12 tablas interconectadas.
-* Programación de migraciones con restricciones de integridad referencial estricta.
-* Configuración de modelos Eloquent (`belongsTo`, `hasMany`, `hasOne`) con lógica de negocio integrada.
-* Desarrollo de seeders para la automatización del estado inicial del catálogo y usuarios.
+### Vista pública
 
----
+Esta sección muestra la navegación inicial del adoptante antes de enviar una solicitud: explicación del proceso, mascotas destacadas y catálogo público.
 
-## Parte 2 — Interfaz y Lógica de Negocio
-
-Responsable: **Karel González**
-
-### Descripción
-
-Implementación de la interfaz de usuario, control de acceso y codificación de las reglas de negocio del sistema.
-
-### Responsabilidades principales
-
-* Desarrollo de las interfaces responsivas para cliente y panel de administración.
-* Implementación de autenticación y control de acceso basado en roles (RBAC).
-* Programación de la máquina de estados para el ciclo de vida de las solicitudes (Pendiente, Aprobada, Rechazada, Adoptada).
-* Generación de la lógica para el seguimiento de requisitos y cierre de adopciones.
-
----
-
-## Integración de Componentes
-
-La capa de presentación (Parte 2) se comunica con la capa de datos (Parte 1) a través de las abstracciones proporcionadas por Eloquent ORM.
-
-| Proceso | Flujo de Integración |
+| Proceso de adopción | Mascotas con menor edad |
 | --- | --- |
-| Suministro | Parte 1 provee la estructura relacional y los datos iniciales. |
-| Consumo | Parte 2 instancia objetos y colecciones a partir de los modelos. |
-| Mutación | Parte 2 aplica las reglas de negocio y modifica el estado de los objetos. |
-| Persistencia | Parte 1 asegura la integridad referencial al confirmar las transacciones. |
+| ![Proceso de adopción](capturas/2.png) | ![Mascotas con menor edad](capturas/3.png) |
+| Explica los pasos generales para explorar, solicitar y completar una adopción. | Presenta mascotas destacadas por edad dentro de la vista pública. |
+
+| Sección pública de mascotas | Catálogo de mascotas |
+| --- | --- |
+| ![Sección pública de mascotas](capturas/4.png) | ![Catálogo de mascotas](capturas/5.png) |
+| Muestra tarjetas de mascotas disponibles con acceso a su detalle. | Permite filtrar o revisar mascotas disponibles para adopción. |
+
+### Catálogo, detalle y solicitud
+
+Estas capturas evidencian el flujo que sigue el adoptante al elegir una mascota, revisar sus requisitos y enviar una solicitud.
+
+| Detalle de mascota | Formulario de solicitud |
+| --- | --- |
+| ![Detalle de mascota](capturas/7.png) | ![Formulario de solicitud de adopción](capturas/8.png) |
+| Presenta datos de la mascota, requisitos aplicables y acción para solicitar la adopción. | Recoge la motivación, experiencia y condiciones de vivienda del adoptante. |
+
+| Solicitud en proceso | Solicitud aprobada |
+| --- | --- |
+| ![Solicitud en proceso](capturas/9.png) | ![Solicitud aprobada](capturas/6.png) |
+| Muestra una solicitud enviada con estado pendiente o en revisión. | Muestra al adoptante una solicitud aprobada con información de la cita. |
+
+### Autenticación y registro
+
+| Registro de adoptante | Solicitud rechazada vista por adoptante |
+| --- | --- |
+| ![Registro de adoptante](capturas/25.png) | ![Solicitud rechazada vista por adoptante](capturas/26.png) |
+| Permite crear una cuenta de adoptante sin intervención administrativa. | Muestra la respuesta cuando una solicitud fue rechazada. |
+
+### Panel administrador
+
+El panel administrativo resume el estado del refugio y permite acceder a los módulos de gestión.
+
+| Dashboard administrativo | Indicadores y gráficas |
+| --- | --- |
+| ![Dashboard administrativo](capturas/10.png) | ![Indicadores y gráficas](capturas/11.png) |
+| Presenta métricas generales sobre mascotas, solicitudes, adopciones y tipos de mascota. | Muestra reportes visuales por tipo de mascota y estado de solicitudes. |
+
+### Catálogos administrativos
+
+Estas pantallas corresponden a los CRUD base usados por el administrador para mantener la información del sistema.
+
+| Tipos de mascotas | Razas por tipo de mascota |
+| --- | --- |
+| ![Tipos de mascotas](capturas/12.png) | ![Razas por tipo de mascota](capturas/13.png) |
+| Permite administrar las categorías generales de mascotas. | Permite registrar y consultar razas asociadas a cada tipo de mascota. |
+
+| Requisitos de adopción | Gestión de mascotas |
+| --- | --- |
+| ![Requisitos de adopción](capturas/14.png) | ![Gestión de mascotas](capturas/15.png) |
+| Administra requisitos generales y obligatorios para el proceso de adopción. | Lista las mascotas registradas con filtros y acciones administrativas. |
+
+### Solicitudes de adopción
+
+El administrador puede revisar solicitudes, responderlas y cambiar su estado según la evaluación del caso.
+
+| Listado de solicitudes | Revisión de solicitud |
+| --- | --- |
+| ![Listado de solicitudes](capturas/16.png) | ![Revisión de solicitud](capturas/17.png) |
+| Muestra solicitudes recibidas, adoptante, mascota, fecha, estado y acciones. | Presenta el detalle de la solicitud y las opciones de aprobación o rechazo. |
+
+| Solicitud rechazada | Solicitud aprobada |
+| --- | --- |
+| ![Solicitud rechazada](capturas/18.png) | ![Solicitud aprobada](capturas/19.png) |
+| Evidencia el registro de una solicitud negada con su respuesta administrativa. | Evidencia una solicitud aprobada y el paso posterior para ver o agendar requisitos. |
+
+### Citas y verificación de requisitos
+
+Después de aprobar una solicitud, el sistema permite programar una cita y revisar el cumplimiento de requisitos.
+
+| Agenda de citas | Cita con requisitos pendientes |
+| --- | --- |
+| ![Agenda de citas](capturas/20.png) | ![Cita con requisitos pendientes](capturas/21.png) |
+| Lista citas de adopción con adoptante, mascota, fecha, lugar y estado. | Permite revisar y actualizar requisitos asociados a una cita específica. |
+
+| Cita completada y adopción registrada |
+| --- |
+| ![Cita completada y adopción registrada](capturas/22.png) |
+| Muestra el cierre del proceso cuando los requisitos han sido aprobados y la adopción puede registrarse. |
+
+### Adopciones y certificado
+
+El cierre del flujo genera un certificado o acta como constancia formal de la adopción.
+
+| Certificado de adopción | Descarga o impresión en PDF |
+| --- | --- |
+| ![Certificado de adopción](capturas/23.png) | ![Descarga o impresión en PDF](capturas/24.png) |
+| Presenta el acta con datos del refugio, adoptante, mascota, fecha y número de acta. | Permite guardar o imprimir el certificado desde el navegador. |
 
 ---
 
-## Decisiones de Ingeniería de Software
+## Instalación y ejecución
 
-* **Framework Laravel**: Seleccionado por la eficiencia en la gestión del ORM y los mecanismos de seguridad integrados (protección CSRF, inyección SQL, XSS).
-* **Control de Acceso**: Consolidación de entidades de usuario en una única tabla con diferenciación mediante el atributo `role_id` para simplificar la autenticación.
-* **Integridad de Datos**: Aplicación de restricciones de borrado (`onDelete('restrict')`) en tablas de catálogo (tipos, razas) para prevenir inconsistencias en registros históricos.
-* **Arquitectura de Trabajo**: Separación estricta de las capas de persistencia y presentación para habilitar el desarrollo concurrente y modular.
-
----
-
-## Instalación y Ejecución
+Comandos sugeridos para Linux/CachyOS:
 
 ```bash
-# Clonación del repositorio
-git clone https://github.com/jdsotomayorjimenez/proyecto_ldp.git
-cd proyecto_ldp
+# Clonar el repositorio
+git clone https://github.com/jdsotomayorjimenez/proyecto-ldp-huellitas.git
+cd proyecto-ldp-huellitas
 
-# Instalación de dependencias
+# Instalar dependencias PHP
 composer install
+
+# Instalar dependencias frontend
 npm install
 
-# Configuración de entorno
+# Crear archivo de entorno
 cp .env.example .env
-php artisan key:generate
 
-# Migración de esquemas e inicialización de datos
+# Generar clave de aplicación
+php artisan key:generate
+```
+
+Configura la base de datos en `.env` con una base llamada `huellitas_db`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=huellitas_db
+DB_USERNAME=tu_usuario
+DB_PASSWORD=tu_contrasena
+```
+
+Luego ejecuta migraciones, seeders y servidores de desarrollo:
+
+```bash
+# Crear tablas y cargar datos iniciales
 php artisan migrate:fresh --seed
 
-# Ejecución del servidor de desarrollo
+# Ejecutar servidor Laravel
 php artisan serve
+
+# En otra terminal, ejecutar Vite si se requiere compilar assets en desarrollo
+npm run dev
 ```
+
+La aplicación quedará disponible normalmente en `http://127.0.0.1:8000`.
 
 ---
 
-## Credenciales de prueba
+## Credenciales de demostración
+
+Las credenciales se encuentran definidas en `database/seeders/UserSeeder.php`.
 
 | Rol | Correo | Contraseña |
-|---|---|---|
+| --- | --- | --- |
 | Administrador | `admin@huellitas.com` | `password` |
 | Adoptante | `adoptante@huellitas.com` | `password` |
 
 ---
 
-## Nota de Autoría
+## Verificación del flujo
 
-Este proyecto representa el esfuerzo conjunto para modernizar la gestión de adopciones, dividiendo el trabajo en una base de datos sólida y una lógica de negocio interactiva.
+Para probar el proceso principal de adopción:
 
-**Juan Diego Sotomayor** | **Karel González**
+1. Iniciar sesión como adoptante.
+2. Ver el catálogo público de mascotas.
+3. Seleccionar una mascota y enviar una solicitud de adopción.
+4. Cerrar sesión.
+5. Iniciar sesión como administrador.
+6. Revisar la solicitud recibida.
+7. Aprobar la solicitud y agendar una cita.
+8. Verificar los requisitos de adopción.
+9. Registrar la adopción cuando los requisitos estén aprobados.
+10. Ver el certificado o acta de adopción.
+
+---
+
+## Estado del proyecto
+
+El proyecto cuenta con una implementación funcional del flujo académico solicitado: autenticación, roles, panel administrador, catálogos base, vista pública, catálogo de mascotas, solicitudes, respuestas administrativas, citas, verificación de requisitos, adopciones y certificado.
+
+Como mejoras futuras podrían considerarse la carga avanzada de imágenes desde el panel, notificaciones automáticas por correo, historial más detallado de cambios de estado, pruebas automatizadas adicionales y mejoras de accesibilidad en las vistas.
+
+---
+
+## Autores
+
+Proyecto desarrollado por:
+
+* Juan Diego Sotomayor
+* Karel González
